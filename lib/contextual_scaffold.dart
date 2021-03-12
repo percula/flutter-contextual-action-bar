@@ -15,42 +15,42 @@ class ContextualScaffold<T> extends StatelessWidget {
 
   final bool allowZeroItems;
 
-  final PreferredSizeWidget appBar;
+  final PreferredSizeWidget? appBar;
   final ContextualAppBar<T> contextualAppBar;
-  final Key scaffoldKey;
+  final Key? scaffoldKey;
 
-  final Widget body;
+  final Widget? body;
 
-  final Widget floatingActionButton;
+  final Widget? floatingActionButton;
 
-  final FloatingActionButtonLocation floatingActionButtonLocation;
+  final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final FloatingActionButtonAnimator floatingActionButtonAnimator;
+  final FloatingActionButtonAnimator? floatingActionButtonAnimator;
 
-  final List<Widget> persistentFooterButtons;
+  final List<Widget>? persistentFooterButtons;
 
-  final Widget drawer;
+  final Widget? drawer;
 
-  final Widget endDrawer;
+  final Widget? endDrawer;
 
-  final Color drawerScrimColor;
+  final Color? drawerScrimColor;
 
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
-  final Widget bottomNavigationBar;
+  final Widget? bottomNavigationBar;
 
-  final Widget bottomSheet;
+  final Widget? bottomSheet;
 
-  final bool resizeToAvoidBottomInset;
+  final bool? resizeToAvoidBottomInset;
 
   final bool primary;
-  final double drawerEdgeDragWidth;
+  final double? drawerEdgeDragWidth;
   final DragStartBehavior drawerDragStartBehavior;
 
   const ContextualScaffold({
-    Key key,
+    Key? key,
     this.appBar,
-    @required this.contextualAppBar,
+    required this.contextualAppBar,
     this.scaffoldKey,
     this.externalProvider = false,
     this.allowZeroItems = false,
@@ -71,12 +71,7 @@ class ContextualScaffold<T> extends StatelessWidget {
     this.extendBodyBehindAppBar = false,
     this.drawerScrimColor,
     this.drawerEdgeDragWidth,
-  })  : assert(primary != null),
-        assert(extendBody != null),
-        assert(contextualAppBar != null),
-        assert(extendBodyBehindAppBar != null),
-        assert(drawerDragStartBehavior != null),
-        super(key: key);
+  })  : super(key: key);
   @override
   Widget build(BuildContext context) {
     if (externalProvider) {
@@ -84,7 +79,7 @@ class ContextualScaffold<T> extends StatelessWidget {
     } else {
       return ChangeNotifierProvider<ItemsController<T>>(
           create: (BuildContext context) => ItemsController<T>(allowZeroItems: allowZeroItems),
-          builder: (BuildContext context, Widget child) {
+          builder: (BuildContext context, Widget? child) {
             return buildScaffold(context);
           }
       );
@@ -117,7 +112,7 @@ class ContextualScaffold<T> extends StatelessWidget {
           drawerEdgeDragWidth: drawerEdgeDragWidth,
         );
       },
-      child: body,
+      child: body!,
     );
   }
 }

@@ -17,30 +17,23 @@ class ContextualScrollView<T> extends StatefulWidget {
   /// The [reverse], [headerSliverBuilder], and [body] arguments must not be
   /// null.
   ContextualScrollView({
-    Key key,
+    Key? key,
     this.controller,
     this.scrollDirection = Axis.vertical,
     this.reverse = false,
     this.physics,
     this.allowZeroItems = false,
-    @required this.headerSliverBuilder,
-    @required this.body,
-    @required this.contextualAppBar,
+    required this.headerSliverBuilder,
+    required this.body,
+    required this.contextualAppBar,
     this.dragStartBehavior = DragStartBehavior.start,
     this.floatHeaderSlivers = false,
     this.clipBehavior = Clip.hardEdge,
-  })  : assert(scrollDirection != null),
-        assert(contextualAppBar != null),
-        assert(headerSliverBuilder != null),
-        assert(reverse != null),
-        assert(body != null),
-        assert(floatHeaderSlivers != null),
-        assert(clipBehavior != null),
-        super(key: key);
+  }) : super(key: key);
 
   /// An object that can be used to control the position to which the outer
   /// scroll view is scrolled.
-  final ScrollController controller;
+  final ScrollController? controller;
 
   /// The axis along which the scroll view scrolls.
   ///
@@ -78,7 +71,7 @@ class ContextualScrollView<T> extends StatefulWidget {
   /// [ScrollMetrics.maxScrollExtent] properties passed to that method. If that
   /// invariant is not maintained, the nested scroll view may respond to user
   /// scrolling erratically.
-  final ScrollPhysics physics;
+  final ScrollPhysics? physics;
 
   /// A builder for any widgets that are to precede the inner scroll views (as
   /// given by [body]).
@@ -127,11 +120,7 @@ class ContextualScrollView<T> extends StatefulWidget {
   static SliverOverlapAbsorberHandle sliverOverlapAbsorberHandleFor(
       BuildContext context) {
     final _InheritedNestedScrollView target = context
-        .dependOnInheritedWidgetOfExactType<_InheritedNestedScrollView>();
-    assert(
-      target != null,
-      'NestedScrollView.sliverOverlapAbsorberHandleFor must be called with a context that contains a NestedScrollView.',
-    );
+        .dependOnInheritedWidgetOfExactType<_InheritedNestedScrollView>()!;
     return target.state._absorberHandle;
   }
 
@@ -209,7 +198,7 @@ class ContextualScrollViewState<T> extends State<ContextualScrollView> {
   ///
   ///  * [outerController], which exposes the [ScrollController] used by the
   ///    sliver(s) contained in [NestedScrollView.headerSliverBuilder].
-  ScrollController get innerController => _coordinator._innerController;
+  ScrollController? get innerController => _coordinator!._innerController;
 
   /// The [ScrollController] provided to the [ScrollView] in
   /// [ContextualScrollView.headerSliverBuilder].
@@ -226,9 +215,9 @@ class ContextualScrollViewState<T> extends State<ContextualScrollView> {
   ///
   ///  * [innerController], which exposes the [ScrollController] used by the
   ///    [ScrollView] contained in [NestedScrollView.body].
-  ScrollController get outerController => _coordinator._outerController;
+  ScrollController? get outerController => _coordinator!._outerController;
 
-  _NestedScrollCoordinator _coordinator;
+  _NestedScrollCoordinator? _coordinator;
 
   @override
   void initState() {
@@ -244,28 +233,28 @@ class ContextualScrollViewState<T> extends State<ContextualScrollView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _coordinator.setParent(widget.controller);
+    _coordinator!.setParent(widget.controller);
   }
 
   @override
   void didUpdateWidget(ContextualScrollView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller)
-      _coordinator.setParent(widget.controller);
+      _coordinator!.setParent(widget.controller);
   }
 
   @override
   void dispose() {
-    _coordinator.dispose();
+    _coordinator!.dispose();
     _coordinator = null;
     super.dispose();
   }
 
-  bool _lastHasScrolledBody;
+  bool? _lastHasScrolledBody;
 
   void _handleHasScrolledBodyChanged() {
     if (!mounted) return;
-    final bool newHasScrolledBody = _coordinator.hasScrolledBody;
+    final bool newHasScrolledBody = _coordinator!.hasScrolledBody;
     if (_lastHasScrolledBody != newHasScrolledBody) {
       setState(() {
         // _coordinator.hasScrolledBody changed (we use it in the build method)
@@ -291,20 +280,20 @@ class ContextualScrollViewState<T> extends State<ContextualScrollView> {
                 state: this,
                 child: Builder(
                   builder: (BuildContext context) {
-                    _lastHasScrolledBody = _coordinator.hasScrolledBody;
+                    _lastHasScrolledBody = _coordinator!.hasScrolledBody;
                     return _NestedScrollViewCustomScrollView(
                       dragStartBehavior: widget.dragStartBehavior,
                       scrollDirection: widget.scrollDirection,
                       reverse: widget.reverse,
                       physics: widget.physics != null
-                          ? widget.physics
+                          ? widget.physics!
                               .applyTo(const ClampingScrollPhysics())
                           : const ClampingScrollPhysics(),
-                      controller: _coordinator._outerController,
+                      controller: _coordinator!._outerController,
                       slivers: widget._buildSlivers(
                         context,
-                        _coordinator._innerController,
-                        _lastHasScrolledBody,
+                        _coordinator!._innerController!,
+                        _lastHasScrolledBody!,
                       ),
                       handle: _absorberHandle,
                       clipBehavior: widget.clipBehavior,
@@ -329,13 +318,13 @@ class ContextualScrollViewState<T> extends State<ContextualScrollView> {
 
 class _NestedScrollViewCustomScrollView extends CustomScrollView {
   const _NestedScrollViewCustomScrollView({
-    @required Axis scrollDirection,
-    @required bool reverse,
-    @required ScrollPhysics physics,
-    @required ScrollController controller,
-    @required List<Widget> slivers,
-    @required this.handle,
-    @required this.clipBehavior,
+    required Axis scrollDirection,
+    required bool reverse,
+    required ScrollPhysics physics,
+    required ScrollController? controller,
+    required List<Widget> slivers,
+    required this.handle,
+    required this.clipBehavior,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
   }) : super(
           scrollDirection: scrollDirection,
@@ -369,12 +358,10 @@ class _NestedScrollViewCustomScrollView extends CustomScrollView {
 
 class _InheritedNestedScrollView extends InheritedWidget {
   const _InheritedNestedScrollView({
-    Key key,
-    @required this.state,
-    @required Widget child,
-  })  : assert(state != null),
-        assert(child != null),
-        super(key: key, child: child);
+    Key? key,
+    required this.state,
+    required Widget child,
+  })  : super(key: key, child: child);
 
   final ContextualScrollViewState state;
 
@@ -384,14 +371,14 @@ class _InheritedNestedScrollView extends InheritedWidget {
 
 class _NestedScrollMetrics extends FixedScrollMetrics {
   _NestedScrollMetrics({
-    @required double minScrollExtent,
-    @required double maxScrollExtent,
-    @required double pixels,
-    @required double viewportDimension,
-    @required AxisDirection axisDirection,
-    @required this.minRange,
-    @required this.maxRange,
-    @required this.correctionOffset,
+    required double minScrollExtent,
+    required double maxScrollExtent,
+    required double pixels,
+    required double viewportDimension,
+    required AxisDirection axisDirection,
+    required this.minRange,
+    required this.maxRange,
+    required this.correctionOffset,
   }) : super(
           minScrollExtent: minScrollExtent,
           maxScrollExtent: maxScrollExtent,
@@ -402,14 +389,14 @@ class _NestedScrollMetrics extends FixedScrollMetrics {
 
   @override
   _NestedScrollMetrics copyWith({
-    double minScrollExtent,
-    double maxScrollExtent,
-    double pixels,
-    double viewportDimension,
-    AxisDirection axisDirection,
-    double minRange,
-    double maxRange,
-    double correctionOffset,
+    double? minScrollExtent,
+    double? maxScrollExtent,
+    double? pixels,
+    double? viewportDimension,
+    AxisDirection? axisDirection,
+    double? minRange,
+    double? maxRange,
+    double? correctionOffset,
   }) {
     return _NestedScrollMetrics(
       minScrollExtent: minScrollExtent ?? this.minScrollExtent,
@@ -430,7 +417,7 @@ class _NestedScrollMetrics extends FixedScrollMetrics {
   final double correctionOffset;
 }
 
-typedef _NestedScrollActivityGetter = ScrollActivity Function(
+typedef _NestedScrollActivityGetter = ScrollActivity? Function(
     _NestedScrollPosition position);
 
 class _NestedScrollCoordinator
@@ -455,31 +442,30 @@ class _NestedScrollCoordinator
   }
 
   final ContextualScrollViewState _state;
-  ScrollController _parent;
+  ScrollController? _parent;
   final VoidCallback _onHasScrolledBodyChanged;
   final bool _floatHeaderSlivers;
 
-  _NestedScrollController _outerController;
-  _NestedScrollController _innerController;
+  _NestedScrollController? _outerController;
+  _NestedScrollController? _innerController;
 
-  _NestedScrollPosition get _outerPosition {
-    if (!_outerController.hasClients) return null;
-    return _outerController.nestedPositions.single;
+  _NestedScrollPosition? get _outerPosition {
+    if (!_outerController!.hasClients) return null;
+    return _outerController!.nestedPositions.single;
   }
 
   Iterable<_NestedScrollPosition> get _innerPositions {
-    return _innerController.nestedPositions;
+    return _innerController!.nestedPositions;
   }
 
   bool get canScrollBody {
-    final _NestedScrollPosition outer = _outerPosition;
+    final _NestedScrollPosition? outer = _outerPosition;
     if (outer == null) return true;
     return outer.haveDimensions && outer.extentAfter == 0.0;
   }
 
   bool get hasScrolledBody {
     for (final _NestedScrollPosition position in _innerPositions) {
-      assert(position.minScrollExtent != null && position.pixels != null);
       if (position.pixels > position.minScrollExtent) {
         return true;
       }
@@ -488,31 +474,30 @@ class _NestedScrollCoordinator
   }
 
   void updateShadow() {
-    if (_onHasScrolledBodyChanged != null) _onHasScrolledBodyChanged();
+    _onHasScrolledBodyChanged();
   }
 
   ScrollDirection get userScrollDirection => _userScrollDirection;
   ScrollDirection _userScrollDirection = ScrollDirection.idle;
 
   void updateUserScrollDirection(ScrollDirection value) {
-    assert(value != null);
     if (userScrollDirection == value) return;
     _userScrollDirection = value;
-    _outerPosition.didUpdateScrollDirection(value);
+    _outerPosition!.didUpdateScrollDirection(value);
     for (final _NestedScrollPosition position in _innerPositions)
       position.didUpdateScrollDirection(value);
   }
 
-  ScrollDragController _currentDrag;
+  ScrollDragController? _currentDrag;
 
   void beginActivity(ScrollActivity newOuterActivity,
       _NestedScrollActivityGetter innerActivityGetter) {
-    _outerPosition.beginActivity(newOuterActivity);
+    _outerPosition!.beginActivity(newOuterActivity);
     bool scrolling = newOuterActivity.isScrolling;
     for (final _NestedScrollPosition position in _innerPositions) {
-      final ScrollActivity newInnerActivity = innerActivityGetter(position);
+      final ScrollActivity? newInnerActivity = innerActivityGetter(position);
       position.beginActivity(newInnerActivity);
-      scrolling = scrolling && newInnerActivity.isScrolling;
+      scrolling = scrolling && newInnerActivity!.isScrolling;
     }
     _currentDrag?.dispose();
     _currentDrag = null;
@@ -520,7 +505,7 @@ class _NestedScrollCoordinator
   }
 
   @override
-  AxisDirection get axisDirection => _outerPosition.axisDirection;
+  AxisDirection get axisDirection => _outerPosition!.axisDirection;
 
   static IdleScrollActivity _createIdleScrollActivity(
       _NestedScrollPosition position) {
@@ -530,7 +515,7 @@ class _NestedScrollCoordinator
   @override
   void goIdle() {
     beginActivity(
-      _createIdleScrollActivity(_outerPosition),
+      _createIdleScrollActivity(_outerPosition!),
       _createIdleScrollActivity,
     );
   }
@@ -538,7 +523,7 @@ class _NestedScrollCoordinator
   @override
   void goBallistic(double velocity) {
     beginActivity(
-      createOuterBallisticScrollActivity(velocity),
+      createOuterBallisticScrollActivity(velocity)!,
       (_NestedScrollPosition position) {
         return createInnerBallisticScrollActivity(
           position,
@@ -548,7 +533,7 @@ class _NestedScrollCoordinator
     );
   }
 
-  ScrollActivity createOuterBallisticScrollActivity(double velocity) {
+  ScrollActivity? createOuterBallisticScrollActivity(double velocity) {
     // This function creates a ballistic scroll for the outer scrollable.
     //
     // It assumes that the outer scrollable can't be overscrolled, and sets up a
@@ -560,7 +545,7 @@ class _NestedScrollCoordinator
     // the center" but there isn't currently a good way to do that so we
     // arbitrarily pick the one that is the furthest away from the infinity we
     // are heading towards.
-    _NestedScrollPosition innerPosition;
+    _NestedScrollPosition? innerPosition;
     if (velocity != 0.0) {
       for (final _NestedScrollPosition position in _innerPositions) {
         if (innerPosition != null) {
@@ -577,9 +562,9 @@ class _NestedScrollCoordinator
 
     if (innerPosition == null) {
       // It's either just us or a velocity=0 situation.
-      return _outerPosition.createBallisticScrollActivity(
-        _outerPosition.physics.createBallisticSimulation(
-          _outerPosition,
+      return _outerPosition!.createBallisticScrollActivity(
+        _outerPosition!.physics.createBallisticSimulation(
+          _outerPosition!,
           velocity,
         ),
         mode: _NestedBallisticScrollActivityMode.independent,
@@ -588,20 +573,20 @@ class _NestedScrollCoordinator
 
     final _NestedScrollMetrics metrics = _getMetrics(innerPosition, velocity);
 
-    return _outerPosition.createBallisticScrollActivity(
-      _outerPosition.physics.createBallisticSimulation(metrics, velocity),
+    return _outerPosition!.createBallisticScrollActivity(
+      _outerPosition!.physics.createBallisticSimulation(metrics, velocity),
       mode: _NestedBallisticScrollActivityMode.outer,
       metrics: metrics,
     );
   }
 
   @protected
-  ScrollActivity createInnerBallisticScrollActivity(
+  ScrollActivity? createInnerBallisticScrollActivity(
       _NestedScrollPosition position, double velocity) {
     return position.createBallisticScrollActivity(
       position.physics.createBallisticSimulation(
         velocity == 0
-            ? position as ScrollMetrics
+            ? position
             : _getMetrics(position, velocity),
         velocity,
       ),
@@ -611,15 +596,14 @@ class _NestedScrollCoordinator
 
   _NestedScrollMetrics _getMetrics(
       _NestedScrollPosition innerPosition, double velocity) {
-    assert(innerPosition != null);
     double pixels, minRange, maxRange, correctionOffset, extra;
     if (innerPosition.pixels == innerPosition.minScrollExtent) {
-      pixels = _outerPosition.pixels.clamp(
-        _outerPosition.minScrollExtent,
-        _outerPosition.maxScrollExtent,
-      ) as double; // TODO(ianh): gracefully handle out-of-range outer positions
-      minRange = _outerPosition.minScrollExtent;
-      maxRange = _outerPosition.maxScrollExtent;
+      pixels = _outerPosition!.pixels.clamp(
+        _outerPosition!.minScrollExtent,
+        _outerPosition!.maxScrollExtent,
+      ); // TODO(ianh): gracefully handle out-of-range outer positions
+      minRange = _outerPosition!.minScrollExtent;
+      maxRange = _outerPosition!.maxScrollExtent;
       assert(minRange <= maxRange);
       correctionOffset = 0.0;
       extra = 0.0;
@@ -628,33 +612,33 @@ class _NestedScrollCoordinator
       if (innerPosition.pixels < innerPosition.minScrollExtent) {
         pixels = innerPosition.pixels -
             innerPosition.minScrollExtent +
-            _outerPosition.minScrollExtent;
+            _outerPosition!.minScrollExtent;
       } else {
         assert(innerPosition.pixels > innerPosition.minScrollExtent);
         pixels = innerPosition.pixels -
             innerPosition.minScrollExtent +
-            _outerPosition.maxScrollExtent;
+            _outerPosition!.maxScrollExtent;
       }
       if ((velocity > 0.0) &&
           (innerPosition.pixels > innerPosition.minScrollExtent)) {
         // This handles going forward (fling up) and inner list is scrolled past
         // zero. We want to grab the extra pixels immediately to shrink.
-        extra = _outerPosition.maxScrollExtent - _outerPosition.pixels;
+        extra = _outerPosition!.maxScrollExtent - _outerPosition!.pixels;
         assert(extra >= 0.0);
         minRange = pixels;
         maxRange = pixels + extra;
         assert(minRange <= maxRange);
-        correctionOffset = _outerPosition.pixels - pixels;
+        correctionOffset = _outerPosition!.pixels - pixels;
       } else if ((velocity < 0.0) &&
           (innerPosition.pixels < innerPosition.minScrollExtent)) {
         // This handles going backward (fling down) and inner list is
         // underscrolled. We want to grab the extra pixels immediately to grow.
-        extra = _outerPosition.pixels - _outerPosition.minScrollExtent;
+        extra = _outerPosition!.pixels - _outerPosition!.minScrollExtent;
         assert(extra >= 0.0);
         minRange = pixels - extra;
         maxRange = pixels;
         assert(minRange <= maxRange);
-        correctionOffset = _outerPosition.pixels - pixels;
+        correctionOffset = _outerPosition!.pixels - pixels;
       } else {
         // This handles going forward (fling up) and inner list is
         // underscrolled, OR, going backward (fling down) and inner list is
@@ -662,29 +646,29 @@ class _NestedScrollCoordinator
         // or shrink over.
         if (velocity > 0.0) {
           // shrinking
-          extra = _outerPosition.minScrollExtent - _outerPosition.pixels;
+          extra = _outerPosition!.minScrollExtent - _outerPosition!.pixels;
         } else {
           assert(velocity < 0.0);
           // growing
-          extra = _outerPosition.pixels -
-              (_outerPosition.maxScrollExtent - _outerPosition.minScrollExtent);
+          extra = _outerPosition!.pixels -
+              (_outerPosition!.maxScrollExtent - _outerPosition!.minScrollExtent);
         }
         assert(extra <= 0.0);
-        minRange = _outerPosition.minScrollExtent;
-        maxRange = _outerPosition.maxScrollExtent + extra;
+        minRange = _outerPosition!.minScrollExtent;
+        maxRange = _outerPosition!.maxScrollExtent + extra;
         assert(minRange <= maxRange);
         correctionOffset = 0.0;
       }
     }
     return _NestedScrollMetrics(
-      minScrollExtent: _outerPosition.minScrollExtent,
-      maxScrollExtent: _outerPosition.maxScrollExtent +
+      minScrollExtent: _outerPosition!.minScrollExtent,
+      maxScrollExtent: _outerPosition!.maxScrollExtent +
           innerPosition.maxScrollExtent -
           innerPosition.minScrollExtent +
           extra,
       pixels: pixels,
-      viewportDimension: _outerPosition.viewportDimension,
-      axisDirection: _outerPosition.axisDirection,
+      viewportDimension: _outerPosition!.viewportDimension,
+      axisDirection: _outerPosition!.axisDirection,
       minRange: minRange,
       maxRange: maxRange,
       correctionOffset: correctionOffset,
@@ -694,29 +678,29 @@ class _NestedScrollCoordinator
   double unnestOffset(double value, _NestedScrollPosition source) {
     if (source == _outerPosition)
       return value.clamp(
-        _outerPosition.minScrollExtent,
-        _outerPosition.maxScrollExtent,
-      ) as double;
+        _outerPosition!.minScrollExtent,
+        _outerPosition!.maxScrollExtent,
+      );
     if (value < source.minScrollExtent)
-      return value - source.minScrollExtent + _outerPosition.minScrollExtent;
-    return value - source.minScrollExtent + _outerPosition.maxScrollExtent;
+      return value - source.minScrollExtent + _outerPosition!.minScrollExtent;
+    return value - source.minScrollExtent + _outerPosition!.maxScrollExtent;
   }
 
-  double nestOffset(double value, _NestedScrollPosition target) {
+  double nestOffset(double value, _NestedScrollPosition? target) {
     if (target == _outerPosition)
       return value.clamp(
-        _outerPosition.minScrollExtent,
-        _outerPosition.maxScrollExtent,
-      ) as double;
-    if (value < _outerPosition.minScrollExtent)
-      return value - _outerPosition.minScrollExtent + target.minScrollExtent;
-    if (value > _outerPosition.maxScrollExtent)
-      return value - _outerPosition.maxScrollExtent + target.minScrollExtent;
-    return target.minScrollExtent;
+        _outerPosition!.minScrollExtent,
+        _outerPosition!.maxScrollExtent,
+      );
+    if (value < _outerPosition!.minScrollExtent)
+      return value - _outerPosition!.minScrollExtent + target!.minScrollExtent;
+    if (value > _outerPosition!.maxScrollExtent)
+      return value - _outerPosition!.maxScrollExtent + target!.minScrollExtent;
+    return target!.minScrollExtent;
   }
 
   void updateCanDrag() {
-    if (!_outerPosition.haveDimensions) return;
+    if (!_outerPosition!.haveDimensions) return;
     double maxInnerExtent = 0.0;
     for (final _NestedScrollPosition position in _innerPositions) {
       if (!position.haveDimensions) return;
@@ -725,16 +709,16 @@ class _NestedScrollCoordinator
         position.maxScrollExtent - position.minScrollExtent,
       );
     }
-    _outerPosition.updateCanDrag(maxInnerExtent);
+    _outerPosition!.updateCanDrag(maxInnerExtent);
   }
 
   Future<void> animateTo(
     double to, {
-    @required Duration duration,
-    @required Curve curve,
+    required Duration duration,
+    required Curve curve,
   }) async {
     final DrivenScrollActivity outerActivity =
-        _outerPosition.createDrivenScrollActivity(
+        _outerPosition!.createDrivenScrollActivity(
       nestOffset(to, _outerPosition),
       duration,
       curve,
@@ -758,7 +742,7 @@ class _NestedScrollCoordinator
 
   void jumpTo(double to) {
     goIdle();
-    _outerPosition.localJumpTo(nestOffset(to, _outerPosition));
+    _outerPosition!.localJumpTo(nestOffset(to, _outerPosition));
     for (final _NestedScrollPosition position in _innerPositions)
       position.localJumpTo(nestOffset(to, position));
     goBallistic(0.0);
@@ -773,7 +757,7 @@ class _NestedScrollCoordinator
   ScrollHoldController hold(VoidCallback holdCancelCallback) {
     beginActivity(
       HoldScrollActivity(
-        delegate: _outerPosition,
+        delegate: _outerPosition!,
         onHoldCanceled: holdCancelCallback,
       ),
       (_NestedScrollPosition position) =>
@@ -794,7 +778,7 @@ class _NestedScrollCoordinator
       onDragCanceled: dragCancelCallback,
     );
     beginActivity(
-      DragScrollActivity(_outerPosition, drag),
+      DragScrollActivity(_outerPosition!, drag),
       (_NestedScrollPosition position) => DragScrollActivity(position, drag),
     );
     assert(_currentDrag == null);
@@ -808,7 +792,7 @@ class _NestedScrollCoordinator
         delta > 0.0 ? ScrollDirection.forward : ScrollDirection.reverse);
     assert(delta != 0.0);
     if (_innerPositions.isEmpty) {
-      _outerPosition.applyFullDragUpdate(delta);
+      _outerPosition!.applyFullDragUpdate(delta);
     } else if (delta < 0.0) {
       // Dragging "up"
       // Prioritize getting rid of any inner overscroll, and then the outer
@@ -827,7 +811,7 @@ class _NestedScrollCoordinator
       }
       if (outerDelta != 0.0) {
         final double innerDelta =
-            _outerPosition.applyClampedDragUpdate(outerDelta);
+            _outerPosition!.applyClampedDragUpdate(outerDelta);
         if (innerDelta != 0.0) {
           for (final _NestedScrollPosition position in _innerPositions)
             position.applyFullDragUpdate(innerDelta);
@@ -838,7 +822,7 @@ class _NestedScrollCoordinator
       double innerDelta = delta;
       // Apply delta to the outer header first if it is configured to float.
       if (_floatHeaderSlivers)
-        innerDelta = _outerPosition.applyClampedDragUpdate(delta);
+        innerDelta = _outerPosition!.applyClampedDragUpdate(delta);
 
       if (innerDelta != 0.0) {
         // Apply the innerDelta, if we have not floated in the outer scrollable,
@@ -854,7 +838,7 @@ class _NestedScrollCoordinator
           overscrolls.add(overscroll);
         }
         if (outerDelta != 0.0)
-          outerDelta -= _outerPosition.applyClampedDragUpdate(outerDelta);
+          outerDelta -= _outerPosition!.applyClampedDragUpdate(outerDelta);
 
         // Now deal with any overscroll
         // TODO(Piinks): Configure which scrollable receives overscroll to
@@ -870,7 +854,7 @@ class _NestedScrollCoordinator
     }
   }
 
-  void setParent(ScrollController value) {
+  void setParent(ScrollController? value) {
     _parent = value;
     updateParent();
   }
@@ -884,8 +868,8 @@ class _NestedScrollCoordinator
   void dispose() {
     _currentDrag?.dispose();
     _currentDrag = null;
-    _outerController.dispose();
-    _innerController.dispose();
+    _outerController!.dispose();
+    _innerController!.dispose();
   }
 
   @override
@@ -897,7 +881,7 @@ class _NestedScrollController extends ScrollController {
   _NestedScrollController(
     this.coordinator, {
     double initialScrollOffset = 0.0,
-    String debugLabel,
+    String? debugLabel,
   }) : super(initialScrollOffset: initialScrollOffset, debugLabel: debugLabel);
 
   final _NestedScrollCoordinator coordinator;
@@ -906,7 +890,7 @@ class _NestedScrollController extends ScrollController {
   ScrollPosition createScrollPosition(
     ScrollPhysics physics,
     ScrollContext context,
-    ScrollPosition oldPosition,
+    ScrollPosition? oldPosition,
   ) {
     return _NestedScrollPosition(
       coordinator: coordinator,
@@ -942,7 +926,7 @@ class _NestedScrollController extends ScrollController {
     // the position change notifications because those happen synchronously
     // during a frame, at a time where it's too late to call setState. Since the
     // result is usually animated, the lag incurred is no big deal.
-    SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
+    SchedulerBinding.instance!.addPostFrameCallback((Duration timeStamp) {
       coordinator.updateShadow();
     });
   }
@@ -960,19 +944,18 @@ class _NestedScrollController extends ScrollController {
 class _NestedScrollPosition extends ScrollPosition
     implements ScrollActivityDelegate {
   _NestedScrollPosition({
-    @required ScrollPhysics physics,
-    @required ScrollContext context,
+    required ScrollPhysics physics,
+    required ScrollContext context,
     double initialPixels = 0.0,
-    ScrollPosition oldPosition,
-    String debugLabel,
-    @required this.coordinator,
+    ScrollPosition? oldPosition,
+    String? debugLabel,
+    required this.coordinator,
   }) : super(
           physics: physics,
           context: context,
           oldPosition: oldPosition,
           debugLabel: debugLabel,
         ) {
-    if (pixels == null && initialPixels != null) correctPixels(initialPixels);
     if (activity == null) goIdle();
     assert(activity != null);
     saveScrollOffset(); // in case we didn't restore but could, so that we don't restore it later
@@ -982,9 +965,9 @@ class _NestedScrollPosition extends ScrollPosition
 
   TickerProvider get vsync => context.vsync;
 
-  ScrollController _parent;
+  ScrollController? _parent;
 
-  void setParent(ScrollController value) {
+  void setParent(ScrollController? value) {
     _parent?.detach(this);
     _parent = value;
     _parent?.attach(this);
@@ -996,7 +979,7 @@ class _NestedScrollPosition extends ScrollPosition
   @override
   void absorb(ScrollPosition other) {
     super.absorb(other);
-    activity.updateDelegate(this);
+    activity!.updateDelegate(this);
   }
 
   @override
@@ -1033,7 +1016,7 @@ class _NestedScrollPosition extends ScrollPosition
     final double max =
         delta > 0.0 ? double.infinity : math.max(maxScrollExtent, pixels);
     final double oldPixels = pixels;
-    final double newPixels = (pixels - delta).clamp(min, max) as double;
+    final double newPixels = (pixels - delta).clamp(min, max);
     final double clampedDelta = newPixels - pixels;
     if (clampedDelta == 0.0) return delta;
     final double overscroll = physics.applyBoundaryConditions(this, newPixels);
@@ -1103,7 +1086,7 @@ class _NestedScrollPosition extends ScrollPosition
   // ballistic.
   @override
   void goBallistic(double velocity) {
-    Simulation simulation;
+    Simulation? simulation;
     if (velocity != 0.0 || outOfRange)
       simulation = physics.createBallisticSimulation(this, velocity);
     beginActivity(createBallisticScrollActivity(
@@ -1112,17 +1095,16 @@ class _NestedScrollPosition extends ScrollPosition
     ));
   }
 
-  ScrollActivity createBallisticScrollActivity(
-    Simulation simulation, {
-    @required _NestedBallisticScrollActivityMode mode,
-    _NestedScrollMetrics metrics,
+  ScrollActivity? createBallisticScrollActivity(
+    Simulation? simulation, {
+    required _NestedBallisticScrollActivityMode mode,
+    _NestedScrollMetrics? metrics,
   }) {
     if (simulation == null) return IdleScrollActivity(this);
-    assert(mode != null);
     switch (mode) {
       case _NestedBallisticScrollActivityMode.outer:
         assert(metrics != null);
-        if (metrics.minRange == metrics.maxRange)
+        if (metrics!.minRange == metrics.maxRange)
           return IdleScrollActivity(this);
         return _NestedOuterBallisticScrollActivity(
           coordinator,
@@ -1141,14 +1123,13 @@ class _NestedScrollPosition extends ScrollPosition
       case _NestedBallisticScrollActivityMode.independent:
         return BallisticScrollActivity(this, simulation, context.vsync);
     }
-    return null;
   }
 
   @override
   Future<void> animateTo(
     double to, {
-    @required Duration duration,
-    @required Curve curve,
+    required Duration duration,
+    required Curve curve,
   }) {
     return coordinator.animateTo(
       coordinator.unnestOffset(to, this),
@@ -1292,7 +1273,7 @@ class _NestedOuterBallisticScrollActivity extends BallisticScrollActivity {
         done = true;
       }
     } else {
-      value = value.clamp(metrics.minRange, metrics.maxRange) as double;
+      value = value.clamp(metrics.minRange, metrics.maxRange);
       done = true;
     }
     final bool result = super.applyMoveTo(value + metrics.correctionOffset);

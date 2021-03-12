@@ -9,13 +9,12 @@ class ContextualAction<T> extends StatelessWidget {
   final Widget child;
   final HandleItems<T> itemsHandler;
   const ContextualAction(
-      {Key key, @required this.itemsHandler, @required this.child})
-      : assert(child != null),
-        super(key: key);
+      {Key? key, required this.itemsHandler, required this.child})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Consumer<ItemsController<T>>(
-      builder: (BuildContext context, ItemsController<T> value, Widget child) {
+      builder: (BuildContext context, ItemsController<T> value, Widget? child) {
         return InkWell(
           onTap: () {
             itemsHandler(value.items);

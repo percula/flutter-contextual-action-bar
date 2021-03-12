@@ -6,20 +6,20 @@ import '../controller/items_controller.dart';
 import '../typedef/handle_items.dart';
 
 class ContextualCloseAction<T> extends StatelessWidget {
-  final HandleItems<T> itemsHandler;
-  final IconData closeIcon;
+  final HandleItems<T>? itemsHandler;
+  final IconData? closeIcon;
   const ContextualCloseAction(
-      {Key key, this.itemsHandler, this.closeIcon})
+      {Key? key, this.itemsHandler, this.closeIcon})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Consumer<ItemsController<T>>(
-      builder: (BuildContext context, ItemsController<T> value, Widget child) {
+      builder: (BuildContext context, ItemsController<T> value, Widget? child) {
         return IconButton(
             icon: Icon(closeIcon ?? Icons.close),
             onPressed: () {
               if (itemsHandler != null) {
-                itemsHandler(value.items);
+                itemsHandler!(value.items);
               }
               ActionMode.disable<T>(context);
             });
