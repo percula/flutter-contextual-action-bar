@@ -1121,7 +1121,7 @@ class _NestedScrollPosition extends ScrollPosition
           context.vsync,
         );
       case _NestedBallisticScrollActivityMode.independent:
-        return BallisticScrollActivity(this, simulation, context.vsync);
+        return BallisticScrollActivity(this, simulation, context.vsync, false);
     }
   }
 
@@ -1199,7 +1199,7 @@ class _NestedInnerBallisticScrollActivity extends BallisticScrollActivity {
     _NestedScrollPosition position,
     Simulation simulation,
     TickerProvider vsync,
-  ) : super(position, simulation, vsync);
+  ) : super(position, simulation, vsync, false);
 
   final _NestedScrollCoordinator coordinator;
 
@@ -1237,7 +1237,7 @@ class _NestedOuterBallisticScrollActivity extends BallisticScrollActivity {
     TickerProvider vsync,
   )   : assert(metrics.minRange != metrics.maxRange),
         assert(metrics.maxRange > metrics.minRange),
-        super(position, simulation, vsync);
+        super(position, simulation, vsync, false);
 
   final _NestedScrollCoordinator coordinator;
   final _NestedScrollMetrics metrics;
