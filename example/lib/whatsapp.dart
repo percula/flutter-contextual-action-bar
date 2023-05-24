@@ -28,7 +28,7 @@ class WhatsAppBody extends StatefulWidget {
 
 class _WhatsAppBodyState extends State<WhatsAppBody>
     with SingleTickerProviderStateMixin {
-  TabController _tabController;
+  late TabController _tabController;
   bool _isUserActionModeEnabled = false;
   bool _isCallActionModeEnabled = false;
 
@@ -118,7 +118,7 @@ class Calls extends StatelessWidget {
                     data: call,
                     child: ListTile(
                       onTap: () {
-                        Scaffold.of(context).showSnackBar(SnackBar(
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text("$call"),
                         ));
                       },
@@ -172,7 +172,7 @@ class Chats extends StatelessWidget {
                     data: user,
                     child: ListTile(
                       onTap: () {
-                        Scaffold.of(context).showSnackBar(SnackBar(
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text("$user"),
                         ));
                       },
@@ -272,7 +272,7 @@ class Call extends Equatable {
   final User friend;
   final String _callTime;
 
-  Call(this.friend, [String callTime])
+  Call(this.friend, {String callTime = "August 20, 11:30AM" })
       : _callTime = callTime ?? "August 20, 11:30AM";
 
   @override
@@ -286,7 +286,7 @@ List<Call> _calls() => _users().map((e) => Call(e)).toList();
 
 extension ContextExtenstion on BuildContext {
   void showSnackBar(String message) =>
-      Scaffold.of(this).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(this).showSnackBar(SnackBar(
         content: Text(message),
       ));
 }

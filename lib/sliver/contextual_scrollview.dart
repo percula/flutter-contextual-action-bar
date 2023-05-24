@@ -379,12 +379,14 @@ class _NestedScrollMetrics extends FixedScrollMetrics {
     required this.minRange,
     required this.maxRange,
     required this.correctionOffset,
+    required double devicePixelRatio,
   }) : super(
           minScrollExtent: minScrollExtent,
           maxScrollExtent: maxScrollExtent,
           pixels: pixels,
           viewportDimension: viewportDimension,
           axisDirection: axisDirection,
+          devicePixelRatio: devicePixelRatio,
         );
 
   @override
@@ -397,6 +399,7 @@ class _NestedScrollMetrics extends FixedScrollMetrics {
     double? minRange,
     double? maxRange,
     double? correctionOffset,
+    double? devicePixelRatio
   }) {
     return _NestedScrollMetrics(
       minScrollExtent: minScrollExtent ?? this.minScrollExtent,
@@ -407,6 +410,7 @@ class _NestedScrollMetrics extends FixedScrollMetrics {
       minRange: minRange ?? this.minRange,
       maxRange: maxRange ?? this.maxRange,
       correctionOffset: correctionOffset ?? this.correctionOffset,
+      devicePixelRatio: devicePixelRatio ?? this.devicePixelRatio,
     );
   }
 
@@ -672,6 +676,7 @@ class _NestedScrollCoordinator
       minRange: minRange,
       maxRange: maxRange,
       correctionOffset: correctionOffset,
+      devicePixelRatio: MediaQuery.of(_state.context).devicePixelRatio,
     );
   }
 
