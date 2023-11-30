@@ -11,8 +11,12 @@ class ItemsController<T> extends ChangeNotifier {
   List<T> get items => _items.toList();
 
   final bool allowZeroItems;
+  final bool multiSelectEnabled;
   
-  ItemsController({this.allowZeroItems = false});
+  ItemsController({
+    this.allowZeroItems = false,
+    this.multiSelectEnabled = true,
+  });
 
   bool isItemPresent(T item) => _items.contains(item);
   StreamController<bool> _isActionModeEnableController =
@@ -39,7 +43,11 @@ class ItemsController<T> extends ChangeNotifier {
   }
 
   void enableActionModeList(Iterable<T> items) {
-    _items.addAll(items);
+    if (!multiSelectEnabled && items.length > 1) {
+      _items.add(items.first);
+    } else {
+      _items.addAll(items);
+    }
     _modifyActionMode(true);
   }
 
@@ -55,6 +63,9 @@ class ItemsController<T> extends ChangeNotifier {
   }
 
   void addItem(T item) {
+    if (!multiSelectEnabled) {
+      _items.clear();
+    }
     _items.add(item);
     if (!_actionModeEnabled) {
       _modifyActionMode(true);
@@ -66,6 +77,9 @@ class ItemsController<T> extends ChangeNotifier {
     if (_items.contains(item)) {
       _items.remove(item);
     } else {
+      if (!multiSelectEnabled) {
+        _items.clear();
+      }
       _items.add(item);
     }
     if (!_actionModeEnabled) {
