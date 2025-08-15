@@ -207,7 +207,7 @@ class _ContextualAppBarState<T> extends State<ContextualAppBar> {
     assert(!widget.primary || debugCheckHasMediaQuery(context));
     assert(debugCheckHasMaterialLocalizations(context));
     final ThemeData theme = Theme.of(context);
-    final AppBarTheme appBarTheme = AppBarTheme.of(context);
+    final AppBarThemeData appBarTheme = AppBarTheme.of(context);
     final ScaffoldState scaffold = Scaffold.of(context);
 
     final bool hasEndDrawer = scaffold.hasEndDrawer;
